@@ -1,7 +1,7 @@
 package br.com.marcioss.libraryapi.api.resources.book;
 
-import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.dto.output.BookDTO;
+import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.services.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,7 +65,18 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should not be able to create a book when there are missing parameters")
-    public void createInvalidBookTest(){
+    public void createInvalidBookTest() throws Exception {
+        String json = new ObjectMapper().writeValueAsString(new BookDTO());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(BOOK_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors", hasSize(3)));
 
     }
 
