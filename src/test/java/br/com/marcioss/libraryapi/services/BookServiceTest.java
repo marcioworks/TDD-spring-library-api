@@ -1,8 +1,10 @@
 package br.com.marcioss.libraryapi.services;
 
 import br.com.marcioss.libraryapi.entity.Book;
+import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.repositories.BookRepository;
 import br.com.marcioss.libraryapi.services.impl.BookServiceImpl;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,9 +20,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("test")
 public class BookServiceTest {
 
+
     BookService service;
     @MockBean
-    private BookRepository repository;
+    BookRepository repository;
 
     @BeforeEach
     public void setUp(){
@@ -30,7 +33,7 @@ public class BookServiceTest {
     @DisplayName("should save a Book")
     public void saveBook(){
         //scenary
-        Book book = Book.builder().author("fulano").title("as Aventuras").isbn("123").build();
+        Book book = createAvalidBook();
         Mockito.when(repository.save(book)).thenReturn(
                 Book.builder()
                         .id(11L)
@@ -47,5 +50,26 @@ public class BookServiceTest {
         assertThat(savedbook.getAuthor()).isEqualTo("fulano");
         assertThat(savedbook.getTitle()).isEqualTo("as Aventuras");
         assertThat(savedbook.getIsbn()).isEqualTo("123");
+    }
+
+    private Book createAvalidBook() {
+        return Book.builder().author("fulano").title("as Aventuras").isbn("123").build();
+    }
+
+    @Test
+    @DisplayName("should throw a Business Exception with duplicate isbn error")
+    public void shouldNotCreatABookWithDuplicatedIsbn(){
+        //scenary
+        Book book = createAvalidBook();
+        Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(true);
+        //execution
+        Throwable exception =  Assertions.catchThrowable(() -> service.save(book));
+
+        //validations
+        assertThat(exception)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("isbn already registered");
+
+        Mockito.verify(repository, Mockito.never()).save(book);
     }
 }

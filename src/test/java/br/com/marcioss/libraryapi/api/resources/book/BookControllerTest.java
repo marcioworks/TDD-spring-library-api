@@ -2,6 +2,7 @@ package br.com.marcioss.libraryapi.api.resources.book;
 
 import br.com.marcioss.libraryapi.dto.output.BookDTO;
 import br.com.marcioss.libraryapi.entity.Book;
+import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.services.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +42,7 @@ public class BookControllerTest {
     @Test
     @DisplayName("Should be able to create a book")
     public void createBookTest() throws Exception{
-        BookDTO dto = BookDTO.builder().author("Marcio").title("as Aventuras").isbn("001").build();
+        BookDTO dto = createBook();
 
         Book saveBook = Book.builder().id(101L).author("Marcio").title("as Aventuras").isbn("001").build();
 
@@ -63,10 +64,35 @@ public class BookControllerTest {
                 .andExpect(jsonPath("isbn").value(dto.getIsbn()));
     }
 
+
+
     @Test
     @DisplayName("Should not be able to create a book when there are missing parameters")
     public void createInvalidBookTest() throws Exception {
+        //scenary
         String json = new ObjectMapper().writeValueAsString(new BookDTO());
+
+        //executions
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(BOOK_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        //validations
+        mvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors", hasSize(3)));
+
+    }
+
+    @Test
+    @DisplayName("shouls throw a business exception with duplicate error message")
+    public void createBookWithDuplicateIsbn() throws Exception {
+        BookDTO dto = createBook();
+        String json = new ObjectMapper().writeValueAsString(dto);
+        String message= "isbn already registered";
+        BDDMockito.given(service.save(Mockito.any(Book.class))).willThrow(new BusinessException(message));
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(BOOK_API)
@@ -76,8 +102,13 @@ public class BookControllerTest {
 
         mvc.perform(request)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("errors", hasSize(3)));
-
+                .andExpect(jsonPath("errors",hasSize(1)))
+                .andExpect(jsonPath("errors[0]").value("isbn already registered"));
     }
 
+
+    private BookDTO createBook() {
+        BookDTO dto = BookDTO.builder().author("Marcio").title("as Aventuras").isbn("001").build();
+        return dto;
+    }
 }

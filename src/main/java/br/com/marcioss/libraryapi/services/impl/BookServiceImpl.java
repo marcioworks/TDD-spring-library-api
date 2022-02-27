@@ -1,17 +1,27 @@
 package br.com.marcioss.libraryapi.services.impl;
 
 import br.com.marcioss.libraryapi.entity.Book;
+import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.repositories.BookRepository;
 import br.com.marcioss.libraryapi.services.BookService;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+
 public class BookServiceImpl implements BookService {
 
-    private final BookRepository repository;
+
+    BookRepository repository;
+
+    public BookServiceImpl(BookRepository repository) {
+        this.repository = repository;
+    }
+
 
     @Override
     public Book save(Book book) {
+        if(repository.existsByIsbn(book.getIsbn())){
+            throw new BusinessException("isbn already registered");
+        }
         return repository.save(book);
     }
+
 }
