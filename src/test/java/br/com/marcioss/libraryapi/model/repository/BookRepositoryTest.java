@@ -40,4 +40,17 @@ public class BookRepositoryTest {
         assertThat(exists).isTrue();
     }
 
+    @Test
+    @DisplayName("should return false when not exists a book with isbn registered")
+    public void returnFalseWhenIsbnNotExists(){
+        //scenary
+        String isbn= "123";
+
+        //execution
+        boolean exists = repository.existsByIsbn(isbn);
+
+        //validations
+        assertThat(exists).isFalse();
+    }
+
 }
