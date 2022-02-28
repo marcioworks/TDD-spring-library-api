@@ -31,7 +31,7 @@ public class BookServiceTest {
     }
     @Test
     @DisplayName("should save a Book")
-    public void saveBook(){
+    public void saveBookTest(){
         //scenary
         Book book = createAvalidBook();
         Mockito.when(repository.save(book)).thenReturn(
@@ -52,13 +52,9 @@ public class BookServiceTest {
         assertThat(savedbook.getIsbn()).isEqualTo("123");
     }
 
-    private Book createAvalidBook() {
-        return Book.builder().author("fulano").title("as Aventuras").isbn("123").build();
-    }
-
     @Test
     @DisplayName("should throw a Business Exception with duplicate isbn error")
-    public void shouldNotCreatABookWithDuplicatedIsbn(){
+    public void shouldNotCreatABookWithDuplicatedIsbnTest(){
         //scenary
         Book book = createAvalidBook();
         Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(true);
@@ -71,5 +67,10 @@ public class BookServiceTest {
                 .hasMessage("isbn already registered");
 
         Mockito.verify(repository, Mockito.never()).save(book);
+    }
+
+
+    private Book createAvalidBook() {
+        return Book.builder().author("fulano").title("as Aventuras").isbn("123").build();
     }
 }

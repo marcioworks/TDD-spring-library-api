@@ -90,7 +90,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("should throw a business exception with duplicate error message")
-    public void createBookWithDuplicateIsbn() throws Exception {
+    public void createBookWithDuplicateIsbnTest() throws Exception {
         BookDTO dto = createBook();
         String json = new ObjectMapper().writeValueAsString(dto);
         String message= "isbn already registered";
@@ -110,26 +110,42 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("should get book details")
-    public void getBookDetails() throws Exception {
+    public void getBookDetailsTest() throws Exception {
+        //scenary
         Long id = 1L;
-
         Book book = Book.builder().id(id)
                 .title(createBook().getTitle())
                 .author(createBook().getAuthor())
                 .isbn(createBook().getIsbn())
                 .build();
 
+        //execution
         BDDMockito.given(service.getById(id)).willReturn(Optional.of(book));
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .get(BOOK_API.concat("/"+id))
                 .accept(MediaType.APPLICATION_JSON);
 
+        //validations
         mvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(id))
                 .andExpect(jsonPath("title").value(createBook().getTitle()))
                 .andExpect(jsonPath("author").value(createBook().getAuthor()))
                 .andExpect(jsonPath("isbn").value(createBook().getIsbn()));
+    }
+
+
+    @Test
+    @DisplayName("should throw a not found exception if the book not found")
+    public void bookNotFoundTest() throws Exception {
+
+        BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API.concat("/"+ 1))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request)
+                .andExpect(status().isNotFound());
     }
     private BookDTO createBook() {
         BookDTO dto = BookDTO.builder().author("Marcio").title("as Aventuras").isbn("001").build();

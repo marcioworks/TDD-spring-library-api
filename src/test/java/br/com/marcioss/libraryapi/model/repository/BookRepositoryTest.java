@@ -26,7 +26,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("should return true when exists a book with isbn registered")
-    public void returnTrueWhenIsbnExists(){
+    public void returnTrueWhenIsbnExistsTest(){
         //scenary
         String isbn= "123";
 
@@ -42,7 +42,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("should return false when not exists a book with isbn registered")
-    public void returnFalseWhenIsbnNotExists(){
+    public void returnFalseWhenIsbnNotExistsTest(){
         //scenary
         String isbn= "123";
 
