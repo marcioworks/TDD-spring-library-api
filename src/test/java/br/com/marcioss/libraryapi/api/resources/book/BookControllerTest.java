@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,7 +89,7 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("shouls throw a business exception with duplicate error message")
+    @DisplayName("should throw a business exception with duplicate error message")
     public void createBookWithDuplicateIsbn() throws Exception {
         BookDTO dto = createBook();
         String json = new ObjectMapper().writeValueAsString(dto);
@@ -106,7 +108,29 @@ public class BookControllerTest {
                 .andExpect(jsonPath("errors[0]").value("isbn already registered"));
     }
 
+    @Test
+    @DisplayName("should get book details")
+    public void getBookDetails() throws Exception {
+        Long id = 1L;
 
+        Book book = Book.builder().id(id)
+                .title(createBook().getTitle())
+                .author(createBook().getAuthor())
+                .isbn(createBook().getIsbn())
+                .build();
+
+        BDDMockito.given(service.getById(id)).willReturn(Optional.of(book));
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API.concat("/"+id))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("title").value(createBook().getTitle()))
+                .andExpect(jsonPath("author").value(createBook().getAuthor()))
+                .andExpect(jsonPath("isbn").value(createBook().getIsbn()));
+    }
     private BookDTO createBook() {
         BookDTO dto = BookDTO.builder().author("Marcio").title("as Aventuras").isbn("001").build();
         return dto;

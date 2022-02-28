@@ -19,7 +19,6 @@ public class BookResource  {
     @Autowired
     ModelMapper modelMapper;
 
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookDTO createBook(@RequestBody @Valid BookDTO dto){
@@ -27,6 +26,15 @@ public class BookResource  {
 
         entity = service.save(entity);
         return modelMapper.map(entity,BookDTO.class);
+    }
+
+    @GetMapping("{id}")
+    public BookDTO getBookById(@PathVariable Long id){
+        Book book = service.getById(id).get();
+        return modelMapper.map(book, BookDTO.class);
+
+
+
     }
 
 

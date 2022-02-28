@@ -5,6 +5,8 @@ import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.repositories.BookRepository;
 import br.com.marcioss.libraryapi.services.BookService;
 
+import java.util.Optional;
+
 
 public class BookServiceImpl implements BookService {
 
@@ -23,5 +25,12 @@ public class BookServiceImpl implements BookService {
         }
         return repository.save(book);
     }
+
+    @Override
+    public Optional<Book> getById(Long id) {
+        return Optional.empty();
+    }
+
+
 
 }
