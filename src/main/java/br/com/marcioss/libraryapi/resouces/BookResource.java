@@ -38,4 +38,20 @@ public class BookResource  {
 
     }
 
+    @PutMapping("{id}")
+    public BookDTO updateBook(@PathVariable Long id, BookDTO dto){
+        Book book = service.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        book.setAuthor(dto.getAuthor());
+        book.setTitle(dto.getTitle());
+        book = service.update(book);
+        return modelMapper.map(book, BookDTO.class);
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBook(@PathVariable Long id){
+        Book book = service.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        service.delete(book);
+    }
+
 }

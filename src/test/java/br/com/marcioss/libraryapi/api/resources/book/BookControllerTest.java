@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -138,14 +139,87 @@ public class BookControllerTest {
     @Test
     @DisplayName("should throw a not found exception if the book not found")
     public void bookNotFoundTest() throws Exception {
+        //scenary
+        BDDMockito.given(service.getById(anyLong())).willReturn(Optional.empty());
 
-        BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+        //executions
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .get(BOOK_API.concat("/"+ 1))
                 .accept(MediaType.APPLICATION_JSON);
 
+        //validations
         mvc.perform(request)
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("should return no content status when delete a book")
+    public void deleteBookTest() throws Exception{
+        BDDMockito.given(service.getById(anyLong())).willReturn(Optional.of(Book.builder().id(1l).build()));
+        //executions
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/"+ 1));
+
+        //validations
+        mvc.perform(request)
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("should return resource not found when delete a nonexistent book")
+    public void deleteNonexistentBookTest() throws Exception{
+        BDDMockito.given(service.getById(anyLong())).willReturn(Optional.empty());
+        //executions
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/"+ 1));
+
+        //validations
+        mvc.perform(request)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("should update a Book")
+    public void updateBookTest() throws Exception {
+        Long id = 1L;
+        String json = new ObjectMapper().writeValueAsString(createBook());
+        Book updatingBook = Book.builder().id(id).title("some title").author("some Author").isbn("321").build();
+        BDDMockito.given(service.getById(id)).willReturn(Optional.of(updatingBook));
+        Book updatedBook = Book.builder().id(id).author("Marcio").title("as Aventuras").isbn("321").build();
+        BDDMockito.given(service.update(updatingBook)).willReturn(updatedBook);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(BOOK_API.concat("/" + 1))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+        mvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("title").value(createBook().getTitle()))
+                .andExpect(jsonPath("author").value(createBook().getAuthor()))
+                .andExpect(jsonPath("isbn").value("321"));
+
+    }
+
+    @Test
+    @DisplayName("should return a not found where try to update a nonexistent Book")
+    public void updateNonexistentBookTest() throws Exception {
+        Long id = 1L;
+        String json = new ObjectMapper().writeValueAsString(createBook());
+        BDDMockito.given(service.getById(id)).willReturn(Optional.empty());
+
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(BOOK_API.concat("/" + 1))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request)
+                .andExpect(status().isNotFound());
+
+
     }
     private BookDTO createBook() {
         BookDTO dto = BookDTO.builder().author("Marcio").title("as Aventuras").isbn("001").build();
