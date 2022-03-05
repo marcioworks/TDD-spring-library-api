@@ -4,6 +4,8 @@ import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.repositories.BookRepository;
 import br.com.marcioss.libraryapi.services.BookService;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -51,6 +53,18 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<Book> find(Book filter, Pageable pageRequest) {
+        Example<Book> example = Example.of(filter,
+                ExampleMatcher
+                        .matching()
+                        .withIgnoreCase()
+                        .withIgnoreNullValues()
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+        );
+        return repository.findAll(example, pageRequest);
+    }
+
+    @Override
+    public Optional<Book> getBookByIsbn(String isbn) {
         return null;
     }
 

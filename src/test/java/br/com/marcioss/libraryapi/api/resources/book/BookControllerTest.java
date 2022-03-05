@@ -3,6 +3,7 @@ package br.com.marcioss.libraryapi.api.resources.book;
 import br.com.marcioss.libraryapi.dto.output.BookDTO;
 import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.exceptions.BusinessException;
+import br.com.marcioss.libraryapi.resouces.BookResource;
 import br.com.marcioss.libraryapi.services.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@WebMvcTest
+@WebMvcTest(controllers = BookResource.class)
 @AutoConfigureMockMvc
 public class BookControllerTest {
 
