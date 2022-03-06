@@ -4,6 +4,7 @@ package br.com.marcioss.libraryapi.api.resources.book;
 import br.com.marcioss.libraryapi.dto.output.LoanDTO;
 import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.entity.Loan;
+import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.resouces.LoanResource;
 import br.com.marcioss.libraryapi.services.BookService;
 import br.com.marcioss.libraryapi.services.LoanService;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -69,6 +71,56 @@ public class LoanControllerTest {
         mvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(content().string("1"));
+
+    }
+
+    @Test
+    @DisplayName("should throw a exception of bad request")
+    public void LoanWithInvalidIsbnTest() throws Exception{
+        LoanDTO dto = LoanDTO.builder().isbn("123").customer("fulano").build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        BDDMockito.given(bookService.getBookByIsbn("123")).willReturn(Optional.empty());
+
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(LOAN_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors",hasSize(1)))
+                .andExpect(jsonPath("errors[0]").value("Book not found"));
+
+
+    }
+
+    @Test
+    @DisplayName("should throw a exception of Business")
+    public void BookAlreadyLoanedTest() throws Exception{
+        //scenary
+        LoanDTO dto = LoanDTO.builder().isbn("123").customer("fulano").build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        Book book = Book.builder().id(1L).isbn("123").build();
+        BDDMockito.given(bookService.getBookByIsbn("123")).willReturn(Optional.of(book));
+
+        BDDMockito.given(loanService.save(Mockito.any(Loan.class)))
+                .willThrow(new BusinessException("Book Already Loaned"));
+
+        //executions
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(LOAN_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        //validations
+        mvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors",hasSize(1)))
+                .andExpect(jsonPath("errors[0]").value("Book Already Loaned"));
+
 
     }
 }
