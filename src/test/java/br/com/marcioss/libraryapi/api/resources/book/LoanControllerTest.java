@@ -1,6 +1,7 @@
 package br.com.marcioss.libraryapi.api.resources.book;
 
 
+import br.com.marcioss.libraryapi.dto.input.ReturnedDTO;
 import br.com.marcioss.libraryapi.dto.output.LoanDTO;
 import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.entity.Loan;
@@ -120,7 +121,23 @@ public class LoanControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("errors",hasSize(1)))
                 .andExpect(jsonPath("errors[0]").value("Book Already Loaned"));
+    }
 
+    @Test
+    @DisplayName("should give back a Loan")
+    public void returnALoan() throws  Exception{
+        ReturnedDTO dto= ReturnedDTO.builder().returned(true).build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+        Loan loan = Loan.builder().id(1L).build();
+
+        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(loan);
+        //executions
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch(LOAN_API.concat("/1"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request).andExpect(status().isOk());
 
     }
 }

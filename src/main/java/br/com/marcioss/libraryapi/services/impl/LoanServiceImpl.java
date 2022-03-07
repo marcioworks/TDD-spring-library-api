@@ -21,4 +21,14 @@ public class LoanServiceImpl implements LoanService {
         }
         return repository.save(loan);
     }
+
+    @Override
+    public Loan getById(Long id) {
+        return null;
+    }
+
+    @Override
+    public void update(Loan loan) {
+
+    }
 }

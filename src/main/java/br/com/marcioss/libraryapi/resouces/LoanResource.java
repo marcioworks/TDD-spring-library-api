@@ -1,5 +1,6 @@
 package br.com.marcioss.libraryapi.resouces;
 
+import br.com.marcioss.libraryapi.dto.input.ReturnedDTO;
 import br.com.marcioss.libraryapi.dto.output.LoanDTO;
 import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.entity.Loan;
@@ -7,10 +8,7 @@ import br.com.marcioss.libraryapi.services.BookService;
 import br.com.marcioss.libraryapi.services.LoanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -35,5 +33,12 @@ public class LoanResource {
         entity = service.save(entity);
         return entity.getId();
 
+    }
+
+    @PatchMapping("{id}")
+    public void returnBook(@PathVariable Long id, @RequestBody ReturnedDTO dto){
+            Loan loan = service.getById(id);
+            loan.setReturned(dto.getReturned());
+            service.update(loan);
     }
 }
