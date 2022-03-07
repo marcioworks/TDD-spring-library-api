@@ -6,6 +6,8 @@ import br.com.marcioss.libraryapi.repositories.LoanRepository;
 import br.com.marcioss.libraryapi.services.LoanService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class LoanServiceImpl implements LoanService {
     private final LoanRepository repository;
@@ -23,7 +25,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public Loan getById(Long id) {
+    public Optional<Loan> getById(Long id) {
         return null;
     }
 

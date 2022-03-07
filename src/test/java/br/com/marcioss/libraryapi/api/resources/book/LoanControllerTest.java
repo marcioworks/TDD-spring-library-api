@@ -130,7 +130,7 @@ public class LoanControllerTest {
         String json = new ObjectMapper().writeValueAsString(dto);
         Loan loan = Loan.builder().id(1L).build();
 
-        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(loan);
+        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(Optional.of(loan));
         //executions
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch(LOAN_API.concat("/1"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -138,6 +138,22 @@ public class LoanControllerTest {
                 .content(json);
 
         mvc.perform(request).andExpect(status().isOk());
+
+    }
+    @Test
+    @DisplayName("should throw a not found exception when give back a nonexistent Loan")
+    public void returnANonexistentLoan() throws  Exception{
+        ReturnedDTO dto= ReturnedDTO.builder().returned(true).build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(Optional.empty());
+        //executions
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch(LOAN_API.concat("/1"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request).andExpect(status().isNotFound());
 
     }
 }
