@@ -1,20 +1,27 @@
 package br.com.marcioss.libraryapi.services;
 
+import br.com.marcioss.libraryapi.dto.input.LoanFilterDto;
 import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.entity.Loan;
 import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.repositories.LoanRepository;
 import br.com.marcioss.libraryapi.services.impl.LoanServiceImpl;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
@@ -130,7 +137,33 @@ public class LoanServiceTest {
 
     }
 
-    public Loan createLoan(){
+    @Test
+    @DisplayName("should filter loan by params")
+    public void findLoanTest(){
+        //scenary
+        LoanFilterDto loanFilter = LoanFilterDto.builder().customers("Fulano").isbn("123").build();
+        Loan loan = createLoan();
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<Loan> list = Arrays.asList(loan);
+        Page<Loan> page = new PageImpl<Loan>(list, pageRequest, 1);
+        when(repository.findByBookIsbnOrCustomer(
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.any(PageRequest.class)))
+                .thenReturn(page);
+
+        //executions
+        Page<Loan> result = service.find(loanFilter, pageRequest);
+
+        //validations
+        AssertionsForClassTypes.assertThat(result.getTotalElements()).isEqualTo(1);
+        AssertionsForClassTypes.assertThat(result.getContent()).isEqualTo(list);
+        AssertionsForClassTypes.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        AssertionsForClassTypes.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+    }
+
+    public static Loan createLoan(){
         Book book = Book.builder().id(1L).build();
         String customers = "Fulano";
        return  Loan.builder()

@@ -168,7 +168,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("should filter bokk by params")
+    @DisplayName("should filter book by params")
     public void findBookTest(){
         //scenary
         Book book = createAvalidBook();

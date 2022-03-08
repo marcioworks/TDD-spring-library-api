@@ -1,6 +1,7 @@
 package br.com.marcioss.libraryapi.api.resources.book;
 
 
+import br.com.marcioss.libraryapi.dto.input.LoanFilterDto;
 import br.com.marcioss.libraryapi.dto.input.ReturnedDTO;
 import br.com.marcioss.libraryapi.dto.output.LoanDTO;
 import br.com.marcioss.libraryapi.entity.Book;
@@ -9,6 +10,7 @@ import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.resouces.LoanResource;
 import br.com.marcioss.libraryapi.services.BookService;
 import br.com.marcioss.libraryapi.services.LoanService;
+import br.com.marcioss.libraryapi.services.LoanServiceTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -27,6 +32,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -155,5 +161,29 @@ public class LoanControllerTest {
 
         mvc.perform(request).andExpect(status().isNotFound());
 
+    }
+
+    @Test
+    @DisplayName("should filter a loan")
+    public void filterLoansPageTest() throws Exception{
+        Long id = 1L;
+        Loan loan = LoanServiceTest.createLoan();
+        Book book = Book.builder().id(1L).isbn("123").build();
+        loan.setBook(book);
+
+        BDDMockito.given(loanService.find(Mockito.any(LoanFilterDto.class),Mockito.any(Pageable.class)))
+                .willReturn(new PageImpl<Loan>(Arrays.asList(loan), PageRequest.of(0,10),1));
+
+        String params = String .format("?isbn=%s&customers=%s&page=0&size=10",book.getIsbn(),loan.getCustomer());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(LOAN_API.concat(params))
+                .accept(MediaType.APPLICATION_JSON);
+        mvc .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content",hasSize(1)))
+                .andExpect(jsonPath("totalElements").value(1))
+                .andExpect(jsonPath("pageable.pageSize").value(10))
+                .andExpect(jsonPath("pageable.pageNumber").value(0));
     }
 }

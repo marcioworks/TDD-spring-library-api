@@ -1,4 +1,4 @@
-package br.com.marcioss.libraryapi.dto.output;
+package br.com.marcioss.libraryapi.dto.input;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,13 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class LoanDTO {
+public class LoanFilterDto {
 
-    private Long id;
     private String isbn;
-    private String customer;
-    private BookDTO book;
+    private String customers;
+
 }

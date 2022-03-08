@@ -1,6 +1,9 @@
 package br.com.marcioss.libraryapi.services;
 
+import br.com.marcioss.libraryapi.dto.input.LoanFilterDto;
 import br.com.marcioss.libraryapi.entity.Loan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -10,4 +13,6 @@ public interface LoanService {
     Optional<Loan> getById(Long id);
 
     Loan update(Loan loan);
+
+    Page<Loan> find(LoanFilterDto dto, Pageable pageRequest);
 }
