@@ -1,6 +1,7 @@
 package br.com.marcioss.libraryapi.services.impl;
 
 import br.com.marcioss.libraryapi.dto.input.LoanFilterDto;
+import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.entity.Loan;
 import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.repositories.LoanRepository;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,5 +43,17 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Page<Loan> find(LoanFilterDto dto, Pageable pageRequest) {
         return repository.findByBookIsbnOrCustomer(dto.getIsbn(), dto.getCustomers(), pageRequest);
+    }
+
+    @Override
+    public Page<Loan> getLoanByBook(Book book, Pageable pageable) {
+        return repository.getByBook(book, pageable);
+    }
+
+    @Override
+    public List<Loan> getAllLateLoans() {
+        final Integer loanDays =4;
+        LocalDate daysInArrear= LocalDate.now().minusDays(loanDays);
+        return repository.findByLoanDateLessThanAndNotReturned(daysInArrear);
     }
 }

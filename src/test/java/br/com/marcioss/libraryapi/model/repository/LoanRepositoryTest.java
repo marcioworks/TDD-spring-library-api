@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static br.com.marcioss.libraryapi.model.repository.BookRepositoryTest.createNewBook;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,5 +65,28 @@ public class LoanRepositoryTest {
         assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
         assertThat(result.getTotalElements()).isEqualTo(1);
 
+    }
+
+    @Test
+    @DisplayName("find all loans in arrear")
+    public void findLoanInArrearTest(){
+        //scenary
+            Loan loan = createAndPersistLoan(LocalDate.now().minusDays(5));
+
+        //execution
+        List<Loan> result = repository.findByLoanDateLessThanAndNotReturned(LocalDate.now().minusDays(4));
+
+        //validations
+        assertThat(result).hasSize(1).contains(loan);
+
+    }
+
+    public Loan createAndPersistLoan(LocalDate loanDate){
+        Book book = createNewBook("123");
+        entityManager.persist(book);
+        Loan loan =  Loan.builder().book(book).customer("Fulano").loanDate(loanDate).build();
+        entityManager.persist(loan);
+
+        return loan;
     }
 }

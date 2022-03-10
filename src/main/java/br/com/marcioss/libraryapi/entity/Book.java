@@ -1,8 +1,12 @@
 package br.com.marcioss.libraryapi.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -20,6 +24,8 @@ public class Book {
     private String author;
     @Column
     private String isbn;
+    @OneToMany(mappedBy = "book")
+    private List<Loan> loans;
 
 
 }
