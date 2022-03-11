@@ -1,0 +1,10 @@
+mail.lateloan.message =Atenção você tem um emprestimo atrasado, favor devolver o livro
+
+spring.mail.host=
+spring.mail.password=
+spring.mail.port=
+spring.mail.username=
+spring.mail.protocol=
+
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
