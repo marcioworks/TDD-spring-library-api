@@ -4,5 +4,6 @@ jdk: oraclejdk8
 dist: trusty
 before_install:
   - chmod +x mvnw
+script:
   - ./mvnw clean install -B
 
