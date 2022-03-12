@@ -1,7 +1,8 @@
 sudo: required
 language: java
 before_install:
-  - ./mvn clean install
+  - chmod +x mvnw
+  - mvn clean install
 
 
 
