@@ -5,6 +5,7 @@ import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.exceptions.BusinessException;
 import br.com.marcioss.libraryapi.resouces.BookResource;
 import br.com.marcioss.libraryapi.services.BookService;
+import br.com.marcioss.libraryapi.services.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ public class BookControllerTest {
 
     @MockBean
     BookService service;
+
+    @MockBean
+    LoanService loanService;
 
     static String BOOK_API ="/api/books";
 
