@@ -3,6 +3,10 @@ language: java
 jdk:
   - openjdk11
 dist: xenial
+addons:
+  apt:
+    packages:
+      - ant
 before_install:
   - chmod +x mvnw
 script:
