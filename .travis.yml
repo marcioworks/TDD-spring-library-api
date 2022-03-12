@@ -1,8 +1,9 @@
-sudo: required
 language: java
-jdk: openjdk11
+jdk:
+  - oraclejdk8
 dist: trusty
-before_install:
-  - chmod +x mvnw
+install:
+  - mvn -N io.takari:maven:wrapper
+  - ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
 
