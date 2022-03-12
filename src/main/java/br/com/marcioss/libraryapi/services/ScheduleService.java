@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ScheduleService {
 
-    @Value("${mail.lateloan.message}")
+    @Value("${mail.lateLoan.message}")
     private String message;
 
     private static final String LOAN_CRON = "0 0 9 1/1 * ?";

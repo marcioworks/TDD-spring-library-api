@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MailServiceImpl implements EmailService {
 
-    @Value("${mail.default-remetent}")
+    @Value("${mail.default-remittent}")
     private String remetent;
 
     private final JavaMailSender javaMailSender;
