@@ -10,14 +10,6 @@ jobs:
       # git pull
       - checkout
 
-      # setup testing env
-      # the following commented lines are not allowed in the free version of circleci
-      #       - setup_remote_docker:
-      #           docker_layer_caching: true
-      - run:
-          name: Decrpyt Secrets
-          command: openssl enc -d -aes-256-ecb -md md5 -in src/main/resources/application-prod.yaml.secrets -out src/main/resources/application-prod.yaml -k $SECRETS_KEY
-
       # Download and cache dependencies
       - restore_cache:
           keys:
