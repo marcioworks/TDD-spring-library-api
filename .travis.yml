@@ -2,10 +2,14 @@ sudo: true
 language: java
 jdk:
   - openjdk11
-dist: trusty
+dist: xenial
 before_install:
   - chmod +x mvnw
-script: mvn clean install
+script:
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+  - chmod +x $TRAVIS_BUILD_DIR/install-jdk.sh
+  - export JAVA_HOME=$HOME/openjdk11
+  - $TRAVIS_BUILD_DIR/install-jdk.sh -F 11 --target $JAVA_HOME
 
 
 
