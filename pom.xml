@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>2.2.1.RELEASE</version>
 	</parent>
 	<groupId>br.com.marcioss</groupId>
 	<artifactId>libray-api</artifactId>
