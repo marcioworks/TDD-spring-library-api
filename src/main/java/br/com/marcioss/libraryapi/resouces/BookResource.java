@@ -6,7 +6,10 @@ import br.com.marcioss.libraryapi.entity.Book;
 import br.com.marcioss.libraryapi.entity.Loan;
 import br.com.marcioss.libraryapi.services.BookService;
 import br.com.marcioss.libraryapi.services.LoanService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +25,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
+@Tag(name = "BOOK API")
+@Slf4j
 public class BookResource  {
 
     private final BookService service;
@@ -31,7 +36,9 @@ public class BookResource  {
     private final LoanService loanService;
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Create a Book")
     public BookDTO createBook(@RequestBody @Valid BookDTO dto){
+        log.info("Create a book for isbn {}", dto.getIsbn());
         Book entity = modelMapper.map(dto, Book.class);
 
         entity = service.save(entity);
