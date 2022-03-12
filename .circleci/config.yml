@@ -1,7 +1,45 @@
-language: java
-jdk:
-  - oraclejdk11
-dist: trusty
 version: 2
-before_install:
-  - chmod +x mvnw
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:11.0.0-jdk-buster
+
+    working_directory: ~/project
+
+    steps:
+      # git pull
+      - checkout
+
+      # setup testing env
+      # the following commented lines are not allowed in the free version of circleci
+      #       - setup_remote_docker:
+      #           docker_layer_caching: true
+      - run:
+          name: Login to DockerHub
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: Decrpyt Secrets
+          command: openssl enc -d -aes-256-ecb -md md5 -in src/main/resources/application-prod.yaml.secrets -out src/main/resources/application-prod.yaml -k $SECRETS_KEY
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - sample-springboot-api-{{ checksum "pom.xml" }}
+
+      - run: mvn dependency:go-offline
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: sample-springboot-api-{{ checksum "pom.xml" }}
+
+      # package into a jar
+      - run: mvn clean package
+
+      # build and push docker image to docker hub
+      - run: mvn clean compile jib:build -Dimage=zarinlo/springboot-api:$CIRCLE_BUILD_NUM
+
+      # store raw contents of src code
+      - store_artifacts:
+          path: target/classes
+          destination: sample-springboot-api
