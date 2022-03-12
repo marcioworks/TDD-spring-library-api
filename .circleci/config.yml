@@ -2,5 +2,6 @@ language: java
 jdk:
   - oraclejdk11
 dist: trusty
+version: 2
 before_install:
   - chmod +x mvnw
