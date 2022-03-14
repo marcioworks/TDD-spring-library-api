@@ -2,6 +2,7 @@ package br.com.marcioss.libraryapi.services.impl;
 
 import br.com.marcioss.libraryapi.services.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,7 +17,8 @@ public class MailServiceImpl implements EmailService {
     @Value("${mail.default-remittent}")
     private String remittent;
 
-    private final JavaMailSender javaMailSender;
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Override
     public void sendMails(String message, List<String> mailList) {
