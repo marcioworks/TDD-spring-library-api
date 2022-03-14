@@ -14,7 +14,7 @@ import java.util.List;
 public class MailServiceImpl implements EmailService {
 
     @Value("${mail.default-remittent}")
-    private String remetent;
+    private String remittent;
 
     private final JavaMailSender javaMailSender;
 
@@ -22,7 +22,7 @@ public class MailServiceImpl implements EmailService {
     public void sendMails(String message, List<String> mailList) {
         String[] mailTo = mailList.toArray(new String[mailList.size()]);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setFrom(remetent);
+        mailMessage.setFrom(remittent);
         mailMessage.setSubject("emprestimo de Livro em atraso");
         mailMessage.setText(message);
 
