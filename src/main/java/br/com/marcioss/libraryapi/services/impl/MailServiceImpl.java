@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MailServiceImpl implements EmailService {
 
-    @Value("${mail.default-remittent}")
+    @Value("${mail.default.remittent}")
     private String remittent;
 
     @Autowired
