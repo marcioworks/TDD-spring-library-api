@@ -13,8 +13,8 @@ import java.util.List;
 @Service
 public class MailServiceImpl implements EmailService {
 
-    @Value("${mail.default.remittent}")
-    private String remittent;
+
+    private String remittent ="mail@library.com";
 
     @Autowired
     private JavaMailSender javaMailSender;
